@@ -3,8 +3,8 @@
 
 Membros:
 
-Adriano Brüning Gutierres
-Gabriel Anunzio
-Gabriel Golgheto
-Gabriel Marcelino
-João Victor
+Adriano Brüning Gutierres  
+Gabriel Anunzio  
+Gabriel Golgheto  
+Gabriel Marcelino  
+João Victor  
