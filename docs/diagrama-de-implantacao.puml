@@ -1,0 +1,38 @@
+@startuml
+ title NexoStock 1.1 - Implantação online proposta
+ skinparam backgroundColor white
+ skinparam shadowing false
+ node "Computador / celular do usuário" <<device>> {
+   node "Navegador" <<executionEnvironment>> as browser {
+     artifact "HTML + CSS + JavaScript" as ui
+   }
+ }
+ node "Render - serviço web" <<cloud>> as render {
+   node "Proxy HTTPS / TLS" as edge
+   node "Node.js 24 - uma instância" <<executionEnvironment>> as app {
+     artifact "server.js + storage.js\nAutenticação / perfis / API\nEstoque / pedidos / simulações" as server
+     artifact "Sessões em memória" as sessions
+   }
+ }
+ node "Neon" <<cloud>> as neon {
+   database "PostgreSQL" as pg {
+     artifact "nexostock_state\nEstado operacional em JSONB" as state
+   }
+ }
+ node "GitHub" <<sourceRepository>> as github {
+   artifact "Código-fonte\npackage-lock.json + render.yaml" as source
+ }
+ browser --> edge : HTTPS / JSON
+ edge --> app : HTTP interno / PORT
+ app --> pg : PostgreSQL com TLS\ntransações e bloqueio de linha
+ github ..> render : implantação do código\nna branch conectada
+ note bottom of pg
+ Dados persistem após reiniciar o serviço web.
+ A tabela é criada automaticamente na primeira execução.
+ end note
+ note bottom of render
+ Arquitetura configurada no pacote; publicação depende
+ de conectar as contas GitHub, Render e Neon.
+ As integrações fiscais e de canais são simulações internas.
+ end note
+@enduml
