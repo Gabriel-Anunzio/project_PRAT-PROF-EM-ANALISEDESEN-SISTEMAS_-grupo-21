@@ -1,0 +1,40 @@
+@startuml
+title NexoStock - Diagrama de implantação
+1ª iteração da fase de construção
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+node "Dispositivo do usuário" <<device>> {
+  node "Navegador web" <<executionEnvironment>> as browser {
+    artifact "index.html\napp.js · style.css" as ui
+  }
+}
+node "Render - serviço web" <<cloud>> as render {
+  node "Proxy HTTPS / TLS" as edge
+  node "Node.js 24\nUma instância" <<executionEnvironment>> as app {
+    artifact "server.js · storage.js · config.js\nAPI / autenticação / regras operacionais" as server
+    artifact "Sessões em memória" as sessions
+    artifact "Guia do usuário e diagrama PDF" as docs
+  }
+}
+node "Neon" <<cloud>> as neon {
+  database "PostgreSQL" as pg {
+    artifact "nexostock_state\nEstado operacional em JSONB" as state
+  }
+}
+node "GitHub" <<repository>> as github {
+  artifact "Código-fonte e documentação\nrender.yaml · package-lock.json" as source
+}
+browser --> edge : HTTPS / API JSON e arquivos
+edge --> app : HTTP interno / PORT
+app --> pg : PostgreSQL / TLS\ntransações e bloqueio de linha
+github ..> render : implantação do código
+note bottom of pg
+Os registros persistem após reiniciar a aplicação.
+Sessões precisam de novo login após o reinício.
+end note
+note bottom of render
+Canais, etiquetas e documentos fiscais são simulações internas.
+Nenhuma API externa de marketplace, transportadora ou SEFAZ está conectada.
+end note
+@enduml
