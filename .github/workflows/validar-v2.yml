@@ -1,0 +1,31 @@
+name: Validar NexoStock e marcar v2
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Criar tag v2 após integração aprovada
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'A5 Aplicando Iteracao 2')
+        run: |
+          if git ls-remote --exit-code --tags origin refs/tags/v2 >/dev/null 2>&1; then
+            echo 'Tag v2 ja existe; nenhuma alteracao necessaria.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag v2 "$GITHUB_SHA"
+            git push origin v2
+          fi

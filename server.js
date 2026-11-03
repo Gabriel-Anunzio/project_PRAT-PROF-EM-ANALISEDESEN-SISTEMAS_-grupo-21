@@ -47,6 +47,22 @@ const find = (a,id,label) => a.find(v=>v.id===id)||fail(label+' não encontrado.
 function bal(d,p,w) { find(d.products,p,'Produto'); find(d.warehouses,w,'Depósito'); let b=d.balances.find(b=>b.productId===p&&b.warehouseId===w); if(!b) { b={productId:p,warehouseId:w,physical:0,reserved:0}; d.balances.push(b); } return b; }
 function mv(d,u,type,p,w,q,ref) { d.movements.push({id:uid(),at:now(),user:u.name,type,productId:p,warehouseId:w,quantity:q,reference:ref,balance:bal(d,p,w).physical}); }
 function audit(d,u,action,detail) { d.audit.push({id:uid(),at:now(),user:u.name,action,detail}); }
+// Catálogo (Iteração 2): regras únicas para edição e importação, sempre aplicadas no servidor.
+function normalizeProduct(d,b) {
+  if(!b||typeof b!=='object'||Array.isArray(b))fail('Dados do produto inválidos.');
+  const existing=b.id?find(d.products,b.id,'Produto'):null;
+  const sku=str(b.sku,'SKU',50).toUpperCase();
+  if(d.products.some(p=>p.sku===sku&&p.id!==existing?.id))fail('SKU já cadastrado.',409);
+  const barcode=String(b.barcode??'').trim();
+  if(barcode.length>30)fail('Código de barras excede 30 caracteres.');
+  if(barcode&&d.products.some(p=>String(p.barcode||'').trim()===barcode&&p.id!==existing?.id))fail('Código de barras já cadastrado.',409);
+  const product={id:existing?.id||uid(),sku,name:str(b.name,'Nome'),category:str(b.category,'Categoria'),
+    variant:str(b.variant||'Padrão','Variante'),price:money(num(b.price,'Preço')),cost:money(num(b.cost,'Custo')),
+    min:num(b.min,'Estoque mínimo'),unit:str(b.unit||'UN','Unidade',10),barcode,
+    weight:num(b.weight??0,'Peso'),active:b.active!==false&&b.active!=='false'&&b.active!=='0'};
+  if(!Number.isInteger(product.min))fail('Estoque mínimo deve ser inteiro.');
+  return product;
+}
 function invariant(d) { for(const b of d.balances) { if(!Number.isInteger(b.physical)||!Number.isInteger(b.reserved)||b.physical<0||b.reserved<0||b.reserved>b.physical) fail('Operação viola a integridade do estoque.'); const reserved=d.orders.filter(o=>o.warehouseId===b.warehouseId&&!['Enviado','Entregue','Cancelado'].includes(o.status)).reduce((s,o)=>s+o.items.filter(i=>i.productId===b.productId).reduce((s,i)=>s+i.qty,0),0); if(reserved!==b.reserved) fail('Inconsistência na reserva.'); } }
 async function tx(u,action,fn) { const saved=await storage.update(next=>{const current=next.users.find(v=>v.id===u.id&&v.active);if(!current||current.role!==u.role)fail('Seu acesso foi alterado. Entre novamente.',403);const result=fn(next);invariant(next);audit(next,current,action,result?.number||result?.sku||result?.id||'Operação concluída');return result;});db=saved.data;return saved.result; }
 function permit(u,right) { if(!rights[u.role]?.includes(right)) fail('Seu perfil não permite esta operação.',403); }
@@ -68,7 +84,7 @@ async function handle(req,res) {
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'");
   try {
     const route=new URL(req.url,'http://localhost').pathname;
-    if(route==='/api/health')return send(res,200,{ok:true,version:'1.1.0'});
+    if(route==='/api/health')return send(res,200,{ok:true,version:'2.0.0'});
     const host=req.headers.host||'';if(!cfg.allowedHosts.has(host))fail('Host não permitido.',403);
     const expectedOrigin=cfg.production?cfg.origin:'http://'+host;
     if(cfg.production)res.setHeader('Strict-Transport-Security','max-age=31536000');
@@ -85,7 +101,31 @@ async function handle(req,res) {
       if(route==='/api/state'&&req.method==='GET') return send(res,200,snapshot(u));
       if(route==='/api/export'&&req.method==='GET') { permit(u,'reports'); return send(res,200,snapshot(u),{'Content-Disposition':'attachment; filename="nexostock-relatorio.json"'}); }
       if(req.method!=='POST') fail('Rota não encontrada.',404); const b=await body(req); let result;
-      if(route==='/api/products') { permit(u,'products'); result=await tx(u,'Cadastro de produto',d=> { const sku=str(b.sku,'SKU',50).toUpperCase(); if(d.products.some(p=>p.sku===sku&&p.id!==b.id)) fail('SKU já cadastrado.',409); const p={id:b.id||uid(),sku,name:str(b.name,'Nome'),category:str(b.category,'Categoria'),variant:str(b.variant||'Padrão','Variante'),price:money(num(b.price,'Preço')),cost:money(num(b.cost,'Custo')),min:num(b.min,'Estoque mínimo'),unit:str(b.unit||'UN','Unidade',10),barcode:String(b.barcode||'').slice(0,30),weight:num(b.weight||0,'Peso'),active:b.active!==false}; if(!Number.isInteger(p.min)) fail('Estoque mínimo deve ser inteiro.'); if(b.id) d.products[d.products.indexOf(find(d.products,b.id,'Produto'))]=p; else d.products.push(p); return p; }); }
+      if(route==='/api/products') { permit(u,'products'); result=await tx(u,'Cadastro de produto',d=> {
+        const p=normalizeProduct(d,b);
+        if(b.id)d.products[d.products.findIndex(old=>old.id===p.id)]=p;
+        else d.products.push(p);
+        return p;
+      }); }
+      else if(route==='/api/products-import') { permit(u,'products');
+        if(!Array.isArray(b.rows)||!b.rows.length||b.rows.length>100)fail('Envie entre 1 e 100 linhas por importação.');
+        result=await tx(u,'Importação de produtos CSV',d=>{
+          const accepted=[],rejected=[];
+          b.rows.forEach((row,index)=>{
+            const line=index+2;
+            try {
+              if(row?.id)fail('Importação não permite alterar produtos existentes.');
+              const p=normalizeProduct(d,row);
+              d.products.push(p);
+              accepted.push({line,sku:p.sku});
+            } catch(e) {
+              if(!e.status)throw e;
+              rejected.push({line,error:e.message});
+            }
+          });
+          return {accepted,rejected};
+        });
+      }
       else if(route==='/api/warehouses') { permit(u,'stock'); result=await tx(u,'Cadastro de depósito',d=> { const name=str(b.name,'Nome'); if(d.warehouses.some(w=>w.name.toLowerCase()===name.toLowerCase())) fail('Depósito já cadastrado.'); const w={id:uid(),name,location:str(b.location,'Localização')}; d.warehouses.push(w); return w; }); }
       else if(route==='/api/receipts') { permit(u,'stock'); result=await tx(u,'Entrada de mercadoria',d=> { const reference=str(b.reference,'Documento de origem',80); if(d.receipts.some(r=>r.reference===reference)) fail('Documento já registrado.',409); const q=qty(b.quantity), cost=money(num(b.cost,'Custo unitário')); const p=find(d.products,b.productId,'Produto'), balance=bal(d,b.productId,b.warehouseId); const physical=d.balances.filter(v=>v.productId===p.id).reduce((s,v)=>s+v.physical,0); p.cost=money((physical*p.cost+q*cost)/(physical+q)); balance.physical+=q; const r={id:uid(),at:now(),reference,supplier:str(b.supplier,'Fornecedor'),productId:p.id,warehouseId:b.warehouseId,quantity:q,cost}; d.receipts.push(r); mv(d,u,'Entrada',p.id,b.warehouseId,q,reference); return r; }); }
       else if(route==='/api/adjust') { permit(u,'stock'); result=await tx(u,'Ajuste de inventário',d=> { const reason=str(b.reason,'Justificativa'); const b0=bal(d,b.productId,b.warehouseId), counted=num(b.counted,'Contagem'); if(!Number.isInteger(counted)||counted<b0.reserved) fail('Contagem deve ser inteira e não pode ser menor que a reserva.'); const delta=counted-b0.physical; if(!delta) fail('A contagem já corresponde ao saldo físico.'); b0.physical=counted; mv(d,u,'Ajuste',b.productId,b.warehouseId,delta,reason); return {id:uid()}; }); }
@@ -109,7 +149,7 @@ async function handle(req,res) {
       return send(res,200,{ok:true,result});
     }
     if(req.method!=='GET'&&req.method!=='HEAD') fail('Método não permitido.',405);
-    const routes={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/style.css':'style.css','/favicon.svg':'favicon.svg','/guia':'../docs/guia-do-usuario.pdf','/diagrama':'../docs/diagrama-de-implantacao.pdf'};
+    const routes={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/import-csv.js':'import-csv.js','/style.css':'style.css','/favicon.svg':'favicon.svg','/guia':'../docs/guia-do-usuario.pdf','/diagrama':'../docs/diagrama-de-implantacao.pdf'};
     const rel=routes[route]; if(!rel) fail('Página não encontrada.',404); const f=path.join(ROOT,'public',rel); if(!fs.existsSync(f)) fail('Arquivo não encontrado.',404);
     const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.pdf':'application/pdf'};
     res.writeHead(200,{'Content-Type':types[path.extname(f)],'Cache-Control':'no-cache'}); if(req.method==='HEAD') res.end(); else fs.createReadStream(f).pipe(res);
