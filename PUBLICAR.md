@@ -12,3 +12,7 @@ A aplicação é acessada pelo navegador, usando o link e as credenciais forneci
 | Componentes da aplicação hospedada | [Diagrama de implantação](docs/diagrama-de-implantacao.pdf) |
 
 Para o acesso, informe **E-mail** e **Senha** na página inicial e clique em **Entrar**. Caso ainda não possua uma conta de avaliação, solicite-a ao grupo responsável pelo projeto.
+
+## Registro da A5 – Praticando
+
+O exercício de versionamento utiliza a tag `v1` para preservar o marco da 1ª iteração e a branch `iteracao2` para registrar duas pequenas alterações de documentação (`README.md` e `PUBLICAR.md`). Após o merge em `main`, a branch `iteracao2` permanece no repositório para conferência pelo professor. Esta etapa não corresponde à implementação da segunda iteração.
