@@ -149,7 +149,7 @@ async function handle(req,res) {
       return send(res,200,{ok:true,result});
     }
     if(req.method!=='GET'&&req.method!=='HEAD') fail('Método não permitido.',405);
-    const routes={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/style.css':'style.css','/favicon.svg':'favicon.svg','/guia':'../docs/guia-do-usuario.pdf','/diagrama':'../docs/diagrama-de-implantacao.pdf'};
+    const routes={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/import-csv.js':'import-csv.js','/style.css':'style.css','/favicon.svg':'favicon.svg','/guia':'../docs/guia-do-usuario.pdf','/diagrama':'../docs/diagrama-de-implantacao.pdf'};
     const rel=routes[route]; if(!rel) fail('Página não encontrada.',404); const f=path.join(ROOT,'public',rel); if(!fs.existsSync(f)) fail('Arquivo não encontrado.',404);
     const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.pdf':'application/pdf'};
     res.writeHead(200,{'Content-Type':types[path.extname(f)],'Cache-Control':'no-cache'}); if(req.method==='HEAD') res.end(); else fs.createReadStream(f).pipe(res);
