@@ -2,7 +2,7 @@
 
 **Sistema de Gestão de Estoque e Pedidos para Operações de E-commerce Multicanal**
 
-Entrega da **1ª iteração da fase de construção** · Grupo 21 · 2026
+Entrega da **2ª iteração da fase de construção** · Grupo 21 · 2026 (preserva a tag `v1`)
 
 ## Apresentação
 
@@ -23,6 +23,7 @@ O acesso é realizado pelo navegador e não exige instalação no computador do 
 
 | Documento | Conteúdo |
 | --- | --- |
+| [Especificação revisada — Iteração 2 (Markdown)](docs/especificacao-iteracao2.md) | Escopo, requisitos e rastreabilidade da versão 2.0. |
 | [Guia do usuário (PDF)](docs/guia-do-usuario.pdf) | Acesso, navegação e instruções das operações. |
 | [Guia do usuário (Markdown)](docs/guia-do-usuario.md) | Versão consultável diretamente no GitHub. |
 | [1ª iteração da construção (PDF)](docs/primeira-iteracao.pdf) | Objetivo, escopo implementado, regras, verificação e limitações. |
@@ -30,7 +31,7 @@ O acesso é realizado pelo navegador e não exige instalação no computador do 
 | [Diagrama de implantação (PDF)](docs/diagrama-de-implantacao.pdf) | Componentes da aplicação hospedada e comunicação entre eles. |
 | [Diagrama editável (PlantUML)](docs/diagrama-de-implantacao.puml) | Fonte do diagrama de implantação. |
 
-## Funcionalidades da primeira iteração
+## Funcionalidades existentes e evolução da segunda iteração
 
 - Produtos e variantes identificados por SKU, com preço, custo e estoque mínimo.
 - Estoque físico, reservado e disponível por depósito; entradas e ajustes de inventário.
@@ -40,6 +41,8 @@ O acesso é realizado pelo navegador e não exige instalação no computador do 
 - Indicadores, histórico de movimentações, auditoria e exportação de dados.
 - Autenticação e perfis **Administrador**, **Gestor** e **Operador**.
 - Simulação de importação de pedidos de canais de venda, etiquetas e documentos fiscais.
+
+Na **Iteração 2**, o sistema passa a impedir códigos de barras duplicados e a oferecer importação CSV de novas variantes com relatório por linha. Importações não geram estoque físico.
 
 As integrações com marketplaces, transportadoras e SEFAZ são **simulações acadêmicas**. Não há emissão real de NF-e/NFC-e, contratação de frete ou comunicação com contas reais de marketplace nesta iteração.
 
@@ -80,9 +83,57 @@ O navegador acessa a aplicação por HTTPS. O servidor mantém os dados no Postg
 
 ## Verificação
 
-A suíte disponível em `tests/` verifica autenticação, permissões, reserva sem alterações parciais, conferência e baixa de estoque, concorrência, transferências, prevenção de duplicidade e persistência após reinício. A verificação do armazenamento PostgreSQL utiliza PGlite em ambiente de teste isolado. O comando de execução é `npm test`.
+A suíte disponível em `tests/` verifica autenticação, permissões, reserva sem alterações parciais, conferência e baixa de estoque, concorrência, transferências, prevenção de duplicidade e persistência após reinício. A verificação do armazenamento PostgreSQL utiliza PGlite em ambiente de teste isolado. O comando de execução é `npm test`. Os novos testes da Iteração 2 estão em `tests/iteracao2.test.js`.
 
 Os resultados e os limites dessa verificação estão descritos no [registro da primeira iteração](docs/primeira-iteracao.md).
+
+## Instalação e execução local (passo a passo)
+
+**Pré-requisitos:** Git, Node.js versão 20 ou superior (recomendado: Node.js 24), npm e um navegador atualizado. Não é necessário PostgreSQL externo para utilizar o modo demonstrativo local.
+
+1. **Clonar e selecionar a versão entregue:**
+
+   ```bash
+   git clone "https://github.com/Gabriel-Anunzio/project_PRAT-PROF-EM-ANALISEDESEN-SISTEMAS_-grupo-21.git"
+   cd "project_PRAT-PROF-EM-ANALISEDESEN-SISTEMAS_-grupo-21"
+   git checkout v2
+   ```
+
+2. **Instalar dependências** com versões travadas no `package-lock.json`:
+
+   ```bash
+   npm ci
+   ```
+
+3. **Iniciar o servidor local** (sem definir `NODE_ENV=production` ou `DATABASE_URL`):
+
+   ```bash
+   npm start
+   ```
+
+4. Abrir **http://localhost:3210** e entrar no modo local usando o usuário de teste `admin@nexostock.local`, senha `Nexo@2026!`. Essas credenciais são **exclusivas da demonstração local** e nunca devem ser usadas em produção.
+5. Para interromper, pressionar `Ctrl+C`. Para reiniciar, executar `npm start` novamente. Os dados locais são mantidos em `data/nexostock.json`. Para restaurar a carga inicial, **pare a aplicação e exclua a pasta `data/`**, ciente de que isso apaga todos os dados locais.
+6. Para executar a suíte automatizada completa (incluindo PGlite, dependência instalada pelo `npm ci`):
+
+   ```bash
+   npm test
+   ```
+
+   Para testar apenas fluxos e regras da Iteração 2, sem PostgreSQL ou PGlite instalado: `node --test tests/fluxos.test.js tests/iteracao2.test.js`.
+
+**Variáveis de ambiente:** `NEXO_PORT` configura a porta local (padrão `3210`); `NEXO_DATA_DIR` configura a pasta de dados local. A variável `DATABASE_URL` é opcional em desenvolvimento e habilita PostgreSQL; use **uma base separada da produção**. Em publicação, `NODE_ENV=production` exige `DATABASE_URL`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` forte (12 a 128 caracteres), além de `APP_URL` HTTPS ou `RENDER_EXTERNAL_URL` fornecida pelo Render. Nunca publique senhas ou strings de conexão no Git.
+
+**Publicação:** o arquivo `render.yaml` contém a configuração de referência do Render. A execução hospedada depende de serviço, banco e credenciais externos e precisa ser verificada separadamente.
+
+### Como utilizar a importação CSV
+
+Em **Produtos**, clique em **Importar CSV** e em **Baixar modelo CSV**. O arquivo UTF-8 deve conter o cabeçalho obrigatório: `sku;name;category;variant;price;cost;min;unit;barcode;weight;active`. Utilize até 100 linhas e até 100 KB. O sistema apresenta totais de registros aceitos/rejeitados e motivos por linha. A importação **não atualiza cadastros existentes** e não gera saldo físico; registre uma entrada para incluir estoque.
+
+### Marcos de versionamento
+
+- **`v1`**: versão da primeira iteração, preservada.
+- **A5 – Praticando**: branch `iteracao2`, modificações documentais, merge pelo Pull Request #1, branch preservada.
+- **`v2`**: código, testes, especificação revisada e instruções de execução local desta segunda iteração.
 
 ## Equipe
 
