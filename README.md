@@ -94,3 +94,9 @@ Os resultados e os limites dessa verificação estão descritos no [registro da 
 
 **Universidade Presbiteriana Mackenzie** · Análise e Desenvolvimento de Sistemas  
 **Componente curricular:** Práticas Profissionais em Análise e Desenvolvimento de Sistemas
+
+## A5 – Praticando: exercício de versionamento
+
+A tag `v1` identifica o código-fonte entregue na primeira iteração da construção (30/09/2026). A branch `iteracao2` foi utilizada para o exercício de controle de versões da A5: duas alterações documentais pequenas em `README.md` e `PUBLICAR.md`, posteriormente integradas à branch principal `main` por merge.
+
+Esta alteração é exclusivamente documental: não altera as funcionalidades da aplicação e **não representa a entrega da implementação da Iteração 2**, que pertence à atividade A5 – Aplicando Conhecimento.
