@@ -2,152 +2,147 @@
 
 **Sistema de Gestão de Estoque e Pedidos para Operações de E-commerce Multicanal**
 
-Entrega da **2ª iteração da fase de construção** · Grupo 21 · 2026 (preserva a tag `v1`)
+Universidade Presbiteriana Mackenzie · Análise e Desenvolvimento de Sistemas · Grupo 21 · 2026
 
-## Apresentação
+## Visão geral
 
-O NexoStock centraliza o cadastro de produtos, o controle de estoque por depósito e o acompanhamento de pedidos, desde a reserva até a entrega. A primeira iteração implementa esse fluxo operacional com autenticação, perfis de acesso, histórico de movimentações e persistência dos dados.
+O NexoStock é uma aplicação web desenvolvida para centralizar o catálogo de produtos e variantes, o controle de estoque multidepósito e o ciclo operacional de pedidos de venda em operações multicanal. O sistema mantém distinção estrita entre saldo físico, saldo reservado e saldo disponível, preservando trilha de auditoria e extrato de movimentações (Kardex) em transações atômicas.
 
-A aplicação está disponibilizada em ambiente web. Os dados de exemplo são fictícios e permitem explorar as funcionalidades para fins acadêmicos.
+## Endereços do projeto
 
-## Acesso para avaliação
-
-1. Abra, no navegador, o **link da aplicação encaminhado pelo grupo junto com a entrega**.
-2. Preencha **E-mail** e **Senha** com as credenciais de avaliação fornecidas pelo grupo.
-3. Clique em **Entrar**. A tela **Visão geral** apresenta os indicadores e a fila de pedidos.
-4. Utilize o menu lateral para navegar. O **Guia do usuário** está disponível na tela de acesso e dentro da aplicação.
-
-O acesso é realizado pelo navegador e não exige instalação no computador do avaliador. As funcionalidades exibidas dependem do perfil da conta. Para avaliar também a administração de usuários, é necessária uma conta com perfil **Administrador**. As credenciais são compartilhadas em canal reservado, separado deste repositório.
-
-## Documentação da entrega
-
-| Documento | Conteúdo |
+| Recurso | Endereço |
 | --- | --- |
-| [Especificação revisada — Iteração 2 (Markdown)](docs/especificacao-iteracao2.md) | Escopo, requisitos e rastreabilidade da versão 2.0. |
-| [Guia do usuário (PDF)](docs/guia-do-usuario.pdf) | Acesso, navegação e instruções das operações. |
-| [Guia do usuário (Markdown)](docs/guia-do-usuario.md) | Versão consultável diretamente no GitHub. |
-| [1ª iteração da construção (PDF)](docs/primeira-iteracao.pdf) | Objetivo, escopo implementado, regras, verificação e limitações. |
-| [1ª iteração da construção (Markdown)](docs/primeira-iteracao.md) | Versão consultável diretamente no GitHub. |
-| [Diagrama de implantação (PDF)](docs/diagrama-de-implantacao.pdf) | Componentes da aplicação hospedada e comunicação entre eles. |
-| [Diagrama editável (PlantUML)](docs/diagrama-de-implantacao.puml) | Fonte do diagrama de implantação. |
+| Aplicação publicada | https://nexostock-qbwn.onrender.com/ |
+| Repositório de código-fonte | https://github.com/Gabriel-Anunzio/project_PRAT-PROF-EM-ANALISEDESEN-SISTEMAS_-grupo-21 |
+| Quadro de acompanhamento (Kanban) | https://trello.com/b/LTKQv7CX |
 
-## Funcionalidades existentes e evolução da segunda iteração
+## Acesso ao ambiente publicado
 
-- Produtos e variantes identificados por SKU, com preço, custo e estoque mínimo.
-- Estoque físico, reservado e disponível por depósito; entradas e ajustes de inventário.
-- Transferências com saída da origem, situação em trânsito e confirmação de recebimento.
-- Pedidos com múltiplos itens, reserva de saldo e cancelamento antes do envio.
-- Separação, conferência dos itens, registro de envio e confirmação de entrega.
-- Indicadores, histórico de movimentações, auditoria e exportação de dados.
-- Autenticação e perfis **Administrador**, **Gestor** e **Operador**.
-- Simulação de importação de pedidos de canais de venda, etiquetas e documentos fiscais.
+1. Acesse **https://nexostock-qbwn.onrender.com/** em um navegador atualizado.
+2. Informe o **E-mail** e a **Senha** da credencial de avaliação disponibilizada no relatório de testes e no guia do usuário.
+3. Clique em **Entrar** para abrir o painel **Visão geral**.
+4. Utilize o menu lateral para navegar pelos módulos operacionais. Os documentos **Guia do usuário** (`/guia`) e **Diagrama de implantação** (`/diagrama`) também podem ser abertos diretamente pela barra lateral da aplicação.
 
-Na **Iteração 2**, o sistema passa a impedir códigos de barras duplicados e a oferecer importação CSV de novas variantes com relatório por linha. Importações não geram estoque físico.
+As operações são controladas por três perfis de acesso validados no servidor:
+- **Administrador**: acesso integral a todos os módulos, exportações e administração de usuários.
+- **Gestor**: gestão de produtos, importação CSV, estoque, depósitos, pedidos, expedição, canais demonstrativos, documentos fiscais demonstrativos e relatórios.
+- **Operador**: consulta da visão geral e execução das rotinas de estoque, pedidos e expedição.
 
-As integrações com marketplaces, transportadoras e SEFAZ são **simulações acadêmicas**. Não há emissão real de NF-e/NFC-e, contratação de frete ou comunicação com contas reais de marketplace nesta iteração.
+## Documentação técnica no repositório
 
-## Percurso sugerido de avaliação
-
-1. Entrar com a conta fornecida pelo grupo e consultar **Visão geral**.
-2. Cadastrar um produto com SKU exclusivo e registrar uma entrada no estoque.
-3. Criar um pedido e observar a diferença entre saldo físico, reservado e disponível.
-4. Separar e conferir todos os itens; registrar o envio e confirmar a entrega.
-5. Consultar o **Kardex** do produto e os indicadores em **Relatórios**.
-6. Explorar transferências e simulações de canais e documentos.
-
-O guia apresenta os passos detalhados. As ações de avaliação gravam registros na mesma base compartilhada; utilize nomes e referências de teste exclusivos.
-
-## Arquitetura
-
-| Camada | Implementação |
+| Documento | Descrição |
 | --- | --- |
-| Interface | HTML, CSS e JavaScript no navegador. |
-| Aplicação | Node.js no Render, com autenticação, regras de negócio e API JSON. |
-| Persistência | PostgreSQL no Neon; estado operacional na tabela `nexostock_state`, em JSONB. |
-| Versionamento | GitHub, com configuração de implantação em `render.yaml`. |
+| [Especificação e Modelagem de Projeto (PDF)](docs/especificacao-sistema.pdf) | Requisitos funcionais e não funcionais, casos de uso, rastreabilidade, wireframes, modelo de domínio, diagramas de classes e de sequência. |
+| [Guia do Usuário (PDF)](docs/guia-do-usuario.pdf) | Manual passo a passo de acesso, navegação e execução de todas as operações do sistema. |
+| [Guia do Usuário (Markdown)](docs/guia-do-usuario.md) | Versão em texto do manual para leitura direta no repositório. |
+| [Diagrama de Implantação (PDF)](docs/diagrama-de-implantacao.pdf) | Arquitetura física do ambiente hospedado, nós, artefatos e protocolos de comunicação. |
+| [Diagrama de Implantação (PlantUML)](docs/diagrama-de-implantacao.puml) | Código-fonte estruturado do diagrama de implantação. |
+| [Plano e Relatório de Testes (PDF)](docs/plano-e-relatorio-de-testes.pdf) | Casos de teste dos casos de uso UC01 a UC10, resultados da execução, métricas apuradas e dados de autenticação. |
+| [Modelo de Importação CSV](docs/modelo-importacao-produtos.csv) | Planilha modelo em UTF-8 para cadastro de produtos em lote. |
 
-O navegador acessa a aplicação por HTTPS. O servidor mantém os dados no PostgreSQL e usa transações para atualizar o estado operacional. As sessões de acesso ficam em memória; reiniciar o serviço exige novo login, mas preserva os registros no banco. A implantação desta iteração utiliza uma instância da aplicação.
+## Escopo funcional implementado
 
-## Organização do repositório
+- **Catálogo de produtos e variantes (`UC01`)**: cadastro, edição e inativação com unicidade obrigatória de SKU (normalizado em maiúsculas) e validação de unicidade de código de barras opcional (até 30 caracteres), além de importação em lote via arquivo CSV (até 100 registros e 100 KB) com relatório individualizado de linhas aceitas e rejeitadas.
+- **Posição de estoque e inventário (`UC02`)**: acompanhamento de saldo físico, reservado e disponível por depósito, alertas de estoque mínimo, extrato Kardex por produto/depósito e ajuste de inventário com justificativa obrigatória e proteção das quantidades reservadas.
+- **Múltiplos depósitos e transferências (`UC03`)**: criação de depósitos, envio de mercadorias com baixa na origem, controle de saldo em trânsito e confirmação idempotente de recebimento no destino.
+- **Entrada de mercadorias (`UC04`)**: registro manual de recebimentos com validação de documento de origem único e recálculo automático do custo médio ponderado global do produto.
+- **Pedidos de venda (`UC05`)**: criação de pedidos com múltiplos itens, reserva atômica integral (recusa sem reservas parciais quando falta saldo), acompanhamento de status e cancelamento antes do envio com estorno automático da reserva.
+- **Expedição (`UC07`)**: fila operacional por etapa (`Reservado → Separação → Pronto → Enviado → Entregue`), conferência obrigatória item a item antes da liberação, registro de transportadora e rastreamento com baixa física única e impressão de etiqueta demonstrativa.
+- **Relatórios e administração (`UC09`, `UC10`)**: indicadores financeiros e operacionais reconciliáveis, trilha de auditoria, exportação de saldos em CSV e de estado em JSON (sem exposição de hashes de senha), autenticação por sessão com expiração por inatividade e controle de usuários por perfil.
+- **Recursos demonstrativos (`UC06`, `UC08`)**: simulação controlada e idempotente de importação de pedidos por canal de venda (`Shopee`, `Mercado Livre` e `Loja virtual`) e emissão de comprovante fiscal demonstrativo sem validade jurídica, operando sem conexão a APIs externas.
 
-| Caminho | Finalidade |
+## Arquitetura do sistema
+
+| Camada | Tecnologia e responsabilidade |
 | --- | --- |
-| `public/` | Interface, estilos, scripts e ícone da aplicação. |
-| `docs/` | Guia, registro da iteração e diagrama de implantação. |
-| `server.js` | Servidor, API, autenticação e regras operacionais. |
-| `storage.js` | Persistência e transações. |
-| `config.js` | Configuração de execução. |
-| `tests/` | Testes automatizados dos fluxos e da persistência. |
-| `render.yaml` | Configuração do serviço hospedado. |
-| `package.json` e `package-lock.json` | Dependências e comandos do projeto. |
+| Cliente | HTML5, CSS3 e JavaScript puro (SPA sem frameworks externos), leitura e pré-validação local de arquivos CSV. |
+| Servidor | Node.js (API HTTP/JSON nativa), autenticação `scrypt` com sal aleatório, sessão via cookie `HttpOnly`, controle de permissões por perfil e validação transacional das invariantes de estoque. |
+| Persistência em produção | PostgreSQL gerenciado (Neon), armazenando o estado operacional em coluna `JSONB` (`nexostock_state`) sob transações `BEGIN / COMMIT / ROLLBACK` e bloqueio de linha (`SELECT ... FOR UPDATE`). |
+| Persistência local | Armazenamento em arquivo JSON atômico (`data/nexostock.json`) com cópias diárias automáticas em `data/backups/` quando `DATABASE_URL` não está configurada. |
 
-## Verificação
+## Instruções para execução local (ambiente de desenvolvimento)
 
-A suíte disponível em `tests/` verifica autenticação, permissões, reserva sem alterações parciais, conferência e baixa de estoque, concorrência, transferências, prevenção de duplicidade e persistência após reinício. A verificação do armazenamento PostgreSQL utiliza PGlite em ambiente de teste isolado. O comando de execução é `npm test`. Os novos testes da Iteração 2 estão em `tests/iteracao2.test.js`.
+**Pré-requisitos:** Git, **Node.js 20 ou superior** (recomendado Node.js 24 LTS), `npm` e um navegador web atualizado. Não é necessário instalar banco PostgreSQL para executar o sistema localmente.
 
-Os resultados e os limites dessa verificação estão descritos no [registro da primeira iteração](docs/primeira-iteracao.md).
-
-## Instalação e execução local (passo a passo)
-
-**Pré-requisitos:** Git, Node.js versão 20 ou superior (recomendado: Node.js 24), npm e um navegador atualizado. Não é necessário PostgreSQL externo para utilizar o modo demonstrativo local.
-
-1. **Clonar e selecionar a versão entregue:**
+1. **Clonar o repositório e acessar o diretório do projeto:**
 
    ```bash
    git clone "https://github.com/Gabriel-Anunzio/project_PRAT-PROF-EM-ANALISEDESEN-SISTEMAS_-grupo-21.git"
    cd "project_PRAT-PROF-EM-ANALISEDESEN-SISTEMAS_-grupo-21"
-   git checkout v2
    ```
 
-2. **Instalar dependências** com versões travadas no `package-lock.json`:
+2. **Instalar as dependências exatamente como especificadas no `package-lock.json`:**
 
    ```bash
    npm ci
    ```
 
-3. **Iniciar o servidor local** (sem definir `NODE_ENV=production` ou `DATABASE_URL`):
+3. **Iniciar o servidor em modo local:**
 
    ```bash
    npm start
    ```
 
-4. Abrir **http://localhost:3210** e entrar no modo local usando o usuário de teste `admin@nexostock.local`, senha `Nexo@2026!`. Essas credenciais são **exclusivas da demonstração local** e nunca devem ser usadas em produção.
-5. Para interromper, pressionar `Ctrl+C`. Para reiniciar, executar `npm start` novamente. Os dados locais são mantidos em `data/nexostock.json`. Para restaurar a carga inicial, **pare a aplicação e exclua a pasta `data/`**, ciente de que isso apaga todos os dados locais.
-6. Para executar a suíte automatizada completa (incluindo PGlite, dependência instalada pelo `npm ci`):
+4. **Acessar a aplicação no navegador:**
+   Abra **http://localhost:3210** e utilize uma das contas locais de demonstração (válidas apenas fora de produção):
+   - **Administrador**: `admin@nexostock.local` · Senha: `Nexo@2026!`
+   - **Gestor**: `gestor@nexostock.local` · Senha: `Nexo@2026!`
+   - **Operador**: `operador@nexostock.local` · Senha: `Nexo@2026!`
+
+5. **Testar a importação de produtos por CSV:**
+   No módulo **Produtos**, clique em **Importar CSV** e selecione o arquivo [docs/modelo-importacao-produtos.csv](docs/modelo-importacao-produtos.csv) (ou gere o modelo pelo botão **Baixar modelo CSV**). O arquivo deve estar codificado em UTF-8, conter até 100 linhas e até 100 KB, com o cabeçalho `sku;name;category;variant;price;cost;min;unit;barcode;weight;active`. Produtos importados iniciam com saldo físico zero; utilize **Estoque > Registrar entrada** para lançar unidades.
+
+6. **Executar a suíte de testes automatizados:**
 
    ```bash
    npm test
    ```
 
-   Para testar apenas fluxos e regras da Iteração 2, sem PostgreSQL ou PGlite instalado: `node --test tests/fluxos.test.js tests/iteracao2.test.js`.
+   Para executar diretamente os testes funcionais e de API sem o adaptador PostgreSQL em memória:
 
-**Variáveis de ambiente:** `NEXO_PORT` configura a porta local (padrão `3210`); `NEXO_DATA_DIR` configura a pasta de dados local. A variável `DATABASE_URL` é opcional em desenvolvimento e habilita PostgreSQL; use **uma base separada da produção**. Em publicação, `NODE_ENV=production` exige `DATABASE_URL`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` forte (12 a 128 caracteres), além de `APP_URL` HTTPS ou `RENDER_EXTERNAL_URL` fornecida pelo Render. Nunca publique senhas ou strings de conexão no Git.
+   ```bash
+   node --test tests/fluxos.test.js tests/iteracao2.test.js tests/plano-testes.test.js
+   ```
 
-**Publicação:** o arquivo `render.yaml` contém a configuração de referência do Render. A execução hospedada depende de serviço, banco e credenciais externos e precisa ser verificada separadamente.
+7. **Reinicializar a massa de dados local (opcional):**
+   Encerre o servidor com `Ctrl+C` e remova a pasta `data/`. Na próxima execução de `npm start`, a carga inicial demonstrativa será recriada automaticamente.
 
-### Como utilizar a importação CSV
+### Variáveis de ambiente
 
-Em **Produtos**, clique em **Importar CSV** e em **Baixar modelo CSV**. O arquivo UTF-8 deve conter o cabeçalho obrigatório: `sku;name;category;variant;price;cost;min;unit;barcode;weight;active`. Utilize até 100 linhas e até 100 KB. O sistema apresenta totais de registros aceitos/rejeitados e motivos por linha. A importação **não atualiza cadastros existentes** e não gera saldo físico; registre uma entrada para incluir estoque.
+| Variável | Uso | Descrição |
+| --- | --- | --- |
+| `NEXO_PORT` / `PORT` | Opcional local | Porta HTTP do servidor (padrão `3210`). |
+| `NEXO_DATA_DIR` | Opcional local | Diretório de gravação do arquivo `nexostock.json` no modo local. |
+| `DATABASE_URL` | Produção / opcional local | String de conexão PostgreSQL (`postgresql://...`). Em conexões remotas, TLS com verificação de certificado é exigido. |
+| `NODE_ENV` | Produção | Quando definido como `production`, exige HTTPS (`APP_URL` ou `RENDER_EXTERNAL_URL`), `DATABASE_URL`, `ADMIN_EMAIL` e `ADMIN_PASSWORD`. |
+| `ADMIN_EMAIL` | Produção | E-mail do administrador inicial criado na primeira carga do banco vazio. |
+| `ADMIN_PASSWORD` | Produção | Senha forte (12 a 128 caracteres) do administrador inicial. |
 
-### Marcos de versionamento
+## Organização de diretórios
 
-- **`v1`**: versão da primeira iteração, preservada.
-- **A5 – Praticando**: branch `iteracao2`, modificações documentais, merge pelo Pull Request #1, branch preservada.
-- **`v2`**: código, testes, especificação revisada e instruções de execução local desta segunda iteração.
+| Caminho | Finalidade |
+| --- | --- |
+| `server.js` | Servidor HTTP, rotas da API, autenticação, autorização e regras operacionais. |
+| `storage.js` | Camada de persistência transacional (`PostgresStore` e `FileStore`). |
+| `config.js` | Leitura e validação das configurações de execução e segurança de cookies/origens. |
+| `public/` | Aplicação cliente (`index.html`, `style.css`, `app.js`, `import-csv.js`, `favicon.svg`). |
+| `tests/` | Suítes automatizadas de fluxos operacionais, catálogo/CSV, persistência PostgreSQL e plano de testes (`UC01` a `UC10`). |
+| `docs/` | Documentação técnica, guia do usuário, diagrama de implantação, relatório de testes e modelo CSV. |
+| `render.yaml` | Especificação declarativa de implantação do serviço web no Render. |
 
-## Equipe
+## Histórico de versões (tags Git)
 
-- Adriano Brüning Gutierres
-- Gabriel Anunzio Araujo
-- Gabriel Henrique Golgheto Souza
-- Gabriel Marcelino da Silva
-- João Victor de Amorim
+- **`v1`**: primeira versão operacional com controle de estoque multidepósito, pedidos, expedição, simulações e persistência PostgreSQL/JSONB.
+- **`v2`**: evolução do módulo de produtos com validação de unicidade de código de barras, importação em lote via CSV com relatório por linha e ampliação dos testes de API.
+- **`v3`**: consolidação final do sistema, padronização da interface, ampliação da suíte automatizada sobre os casos de teste aplicáveis (`UC01` a `UC10`) e documentação técnica completa revisada.
 
-**Universidade Presbiteriana Mackenzie** · Análise e Desenvolvimento de Sistemas  
-**Componente curricular:** Práticas Profissionais em Análise e Desenvolvimento de Sistemas
+## Integrantes (Grupo 21)
 
-## A5 – Praticando: exercício de versionamento
+- Adriano Brüning Gutierres (10739372)
+- Gabriel Anunzio Araujo (10721727)
+- Gabriel Henrique Golgheto Souza (10722105)
+- Gabriel Marcelino da Silva (10722757)
+- João Victor de Amorim (10726542)
 
-A tag `v1` identifica o código-fonte entregue na primeira iteração da construção (30/09/2026). A branch `iteracao2` foi utilizada para o exercício de controle de versões da A5: duas alterações documentais pequenas em `README.md` e `PUBLICAR.md`, posteriormente integradas à branch principal `main` por merge.
-
-Esta alteração é exclusivamente documental: não altera as funcionalidades da aplicação e **não representa a entrega da implementação da Iteração 2**, que pertence à atividade A5 – Aplicando Conhecimento.
+**Orientação:** Prof. Joaquim Pessoa Filho e Prof. Cristiano Morais de Souza  
+**Universidade Presbiteriana Mackenzie** - Práticas Profissionais em Análise e Desenvolvimento de Sistemas

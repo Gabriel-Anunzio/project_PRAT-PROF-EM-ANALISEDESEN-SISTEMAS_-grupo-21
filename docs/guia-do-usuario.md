@@ -1,175 +1,178 @@
-# Guia do usuário
-## NexoStock
-Sistema de Gestão de Estoque e Pedidos para Operações de E-commerce Multicanal.
+# Guia do Usuário - NexoStock
 
-**1ª iteração da fase de construção · Grupo 21 · 2026**
+**Sistema de Gestão de Estoque e Pedidos para Operações de E-commerce Multicanal**  
+Universidade Presbiteriana Mackenzie · Grupo 21 · Versão 2.1 · 2026
 
-Este guia apresenta o acesso e as operações disponíveis na aplicação web. Os registros de exemplo são fictícios e destinam-se à demonstração acadêmica.
+Este guia descreve os procedimentos de acesso, navegação e operação de todos os módulos disponíveis na aplicação web NexoStock.
 
-### 1. Entrar no sistema
-1. Acesse o sistema pelo link: **https://nexostock-qbwn.onrender.com/**.
-2. Na tela de acesso, utilize a credencial correspondente ao seu nome. Os dois acessos possuem perfil **Administrador**.
+---
 
-| Professor | E-mail | Perfil | Senha |
+## 1. Acesso ao sistema e perfis
+
+### 1.1 Entrar no ambiente publicado
+
+1. Abra o navegador e acesse **https://nexostock-qbwn.onrender.com/**.
+2. Informe uma das credenciais de avaliação abaixo (ambas configuradas com perfil **Administrador**):
+
+| Avaliador | E-mail | Perfil | Senha |
 | --- | --- | --- | --- |
-| Cristiano Morais de Sousa | cristiano.sousa@nexostock.local | **Administrador** | **cristiano.sousa** |
-| Joaquim Pessoa Filho | joaquim.pessoa@nexostock.local | **Administrador** | **joaquim.pessoa** |
+| Cristiano Morais de Sousa | `cristiano.sousa@nexostock.local` | Administrador | `cristiano.sousa` |
+| Joaquim Pessoa Filho | `joaquim.pessoa@nexostock.local` | Administrador | `joaquim.pessoa` |
 
-3. Clique em **Entrar**. O sistema abrirá a tela **Visão geral**.
+3. Clique em **Entrar**. O sistema apresentará o painel **Visão geral**.
 
-É necessário um navegador atualizado e conexão com a internet. Não é preciso instalar o sistema no computador.
+Não é necessária nenhuma instalação no computador do usuário. Após 30 minutos de inatividade, a sessão é encerrada automaticamente por segurança, bastando autenticar-se novamente.
 
-### Perfis de acesso
-| Perfil | Áreas disponíveis |
+### 1.2 Perfis de permissão
+
+| Perfil | Módulos e operações habilitados |
 | --- | --- |
-| Administrador | Todas as áreas, incluindo cadastro e edição de usuários. |
-| Gestor | Produtos, estoque, pedidos, expedição, canais, documentos fiscais demonstrativos e relatórios. |
-| Operador | Estoque, pedidos e expedição, além da visão geral. |
+| Administrador | Acesso completo a todos os módulos, exportações de dados e administração de contas de usuário. |
+| Gestor | Produtos (cadastro, edição e importação CSV), estoque, depósitos, transferências, pedidos, expedição, canais demonstrativos, documentos fiscais demonstrativos e relatórios. |
+| Operador | Visão geral, posição de estoque, entradas, transferências, ajustes, pedidos e expedição. |
 
-### Navegação e saída
-Selecione uma opção no menu lateral. Em telas pequenas, abra o menu pelo botão no cabeçalho. Produtos, estoque e pedidos possuem busca; estoque e pedidos também oferecem filtros.
+### 1.3 Navegação geral
 
-Use **Guia do usuário** para reabrir este documento e **Diagrama de implantação** para consultar a arquitetura. Clique em **Sair** para encerrar o acesso. Após 30 minutos sem atividade no servidor, a sessão expira e é necessário entrar novamente.
+Utilize o menu lateral esquerdo para alternar entre os módulos. Em telas reduzidas, acione o botão de menu no canto superior esquerdo. Na parte inferior da barra lateral estão disponíveis os atalhos diretos para abrir este **Guia do usuário** e o **Diagrama de implantação** em PDF. Para encerrar o acesso com segurança, clique em **Sair** no cabeçalho superior direito.
 
-### Visão geral
-O painel apresenta pedidos em operação, unidades disponíveis, produtos em alerta e vendas expedidas. Vendas expedidas considera os pedidos enviados e entregues. Os indicadores variam conforme as operações registradas pelos usuários.
+---
 
-<!-- page -->
-## 2. Produtos e estoque
+## 2. Catálogo de produtos e importação CSV (`UC01`)
 
-### Cadastrar um produto
-1. Abra **Produtos** e clique em **Cadastrar produto**.
-2. Preencha nome, SKU, categoria, variante, preço de venda, custo unitário, estoque mínimo, unidade e peso. O código de barras é opcional.
-3. Clique em **Salvar**. O SKU deve ser exclusivo; utilize outro SKU para uma variante de cor ou tamanho diferente.
+### 2.1 Cadastrar ou editar um produto individualmente
 
-O cadastro do produto não adiciona unidades ao estoque. Para disponibilizar mercadoria, registre uma entrada. Use **Editar** para alterar o cadastro ou desmarcar **Produto ativo**.
+1. Acesse **Produtos** no menu lateral e clique em **Cadastrar produto**.
+2. Preencha nome, **SKU único da variante**, categoria, variante (cor, tamanho ou padrão), preço de venda, custo unitário, estoque mínimo, unidade e peso.
+3. O campo **Código de barras** é opcional (até 30 caracteres), mas, quando preenchido, deve ser exclusivo em todo o catálogo. O sistema recusa códigos ou SKUs já atribuídos a outro item.
+4. Clique em **Salvar**. Para modificar dados ou inativar um item sem perder seu histórico, utilize o botão **Editar** na listagem e ajuste a opção **Produto ativo**.
 
-### Registrar uma entrada
-1. Abra **Estoque > Registrar entrada**.
-2. Selecione produto e depósito. Informe quantidade recebida, custo unitário, fornecedor e **Documento de origem único**.
-3. Clique em **Salvar**. O saldo físico aumenta e o custo médio é recalculado.
+O cadastro cria o item no catálogo com saldo inicial zero. Para disponibilizar unidades físicas para venda, registre uma entrada de mercadorias no módulo **Estoque**.
 
-O mesmo documento de origem não pode ser usado para registrar novamente a entrada. Antes de repetir uma operação, confira se ela já aparece no histórico.
+### 2.2 Importar produtos em lote por arquivo CSV
 
-### Entender os saldos
-| Saldo | Significado |
+A funcionalidade permite aos perfis **Gestor** e **Administrador** cadastrar até 100 novas variantes por arquivo (limite de 100 KB):
+
+1. Em **Produtos**, clique em **Importar CSV**.
+2. Se desejar, clique em **Baixar modelo CSV** para obter a planilha padrão codificada em UTF-8 com ponto e vírgula (`;`).
+3. Preencha as colunas obrigatórias: `sku;name;category;variant;price;cost;min;unit;barcode;weight;active`.
+4. Selecione o arquivo `.csv` e clique em **Validar e importar**.
+5. Confira o **Resultado da importação**, que apresenta o total de itens aceitos, o total de rejeições e o motivo detalhado por número de linha (como SKU repetido, código de barras duplicado ou campo obrigatório vazio).
+
+Linhas inválidas não interrompem o cadastro das linhas válidas do mesmo lote. A importação cadastra apenas produtos novos (não sobrescreve produtos existentes) e não cria saldo físico automaticamente.
+
+---
+
+## 3. Controle de estoque, depósitos e movimentações (`UC02`, `UC03`, `UC04`)
+
+### 3.1 Compreender os indicadores de saldo
+
+| Indicador | Significado operacional |
 | --- | --- |
-| Físico | Unidades registradas no depósito. |
-| Reservado | Unidades comprometidas com pedidos ainda não enviados. |
-| Disponível | Saldo físico menos o reservado; quantidade liberada para novos pedidos. |
-| Em trânsito | Mercadorias transferidas que ainda aguardam recebimento no destino. |
+| Físico | Quantidade total presente fisicamente no depósito. |
+| Reservado | Unidades comprometidas com pedidos em aberto (`Reservado`, `Separação` ou `Pronto`). |
+| Disponível | Saldo físico menos saldo reservado; quantidade efetivamente livre para novos pedidos e transferências. |
+| Em trânsito | Unidades que já saíram do depósito de origem em uma transferência e aguardam confirmação no destino. |
 
-### Ajustar inventário e consultar o histórico
-Em **Estoque > Ajustar inventário**, escolha produto e depósito, informe a quantidade física contada e uma justificativa. A contagem deve ser inteira e não pode ser menor que a quantidade reservada.
+### 3.2 Registrar entrada de mercadorias
 
-Na tabela **Posição de estoque**, clique em **Kardex** para consultar data, tipo de movimentação, quantidade, saldo físico, referência e usuário responsável pelo produto no depósito selecionado.
+1. Acesse **Estoque > Registrar entrada**.
+2. Escolha o produto e o depósito de destino.
+3. Informe a quantidade inteira recebida, o custo unitário da compra, o fornecedor e um **Documento de origem único** (ex.: número da nota ou referência interna).
+4. Clique em **Salvar**. O saldo físico do depósito é acrescido e o custo médio ponderado do produto é recalculado considerando o estoque físico total existente. Documentos repetidos são recusados para evitar entradas duplicadas.
 
-<!-- page -->
-## 3. Pedidos e expedição
+### 3.3 Consultar o Kardex e ajustar inventário
 
-### Criar um pedido
-1. Abra **Pedidos > Novo pedido**.
-2. Informe cliente, canal de venda, depósito de atendimento e referência única.
-3. Escolha produto e quantidade. Use **Adicionar item** para incluir outros produtos.
-4. Clique em **Salvar**. O pedido ficará **Reservado** e o sistema comprometerá o saldo necessário.
+- **Extrato Kardex**: na tabela **Posição de estoque**, utilize a busca ou o filtro por depósito e clique em **Kardex** na linha desejada para visualizar data, tipo de movimento, quantidade, saldo resultante, documento de origem e responsável.
+- **Ajustar inventário**: clique em **Ajustar inventário**, selecione produto e depósito, informe a **Quantidade física contada** e preencha a **Justificativa obrigatória**. A contagem deve ser inteira e não pode ser inferior à quantidade atualmente reservada por pedidos em andamento.
 
-Se qualquer item não tiver saldo suficiente, o pedido inteiro é recusado e não são criadas reservas parciais. Os preços vêm do cadastro dos produtos e o total é calculado pelo sistema.
+### 3.4 Criar depósitos e transferir mercadorias
 
-### Separar, conferir e enviar
-1. Em **Expedição**, localize o pedido e clique em **Detalhes**.
-2. Clique em **Iniciar separação**. O pedido passa para **Separação**.
-3. Marque **Conferido** em cada item e clique em **Concluir conferência**. Todos os itens devem estar conferidos.
-4. Quando o pedido estiver **Pronto**, clique em **Registrar envio**. Informe transportadora e código de rastreamento, depois salve.
-5. Após o recebimento pelo cliente, abra os detalhes do pedido e clique em **Confirmar entrega**.
+1. Para cadastrar um novo local de armazenagem, clique em **Novo depósito** no módulo **Estoque**, informe nome e localização e salve.
+2. Para movimentar unidades entre locais, clique em **Transferir**, selecione o produto, o depósito de origem, o depósito de destino (distinto da origem), a quantidade (limitada ao saldo disponível) e uma referência única.
+3. Ao salvar, a quantidade sai imediatamente do depósito de origem e a transferência permanece com situação **Em trânsito**.
+4. Quando a mercadoria chegar ao destino, localize o registro no quadro **Transferências** e clique em **Confirmar recebimento**. O saldo físico do destino é creditado uma única vez e a situação passa para **Recebida**.
 
-O envio reduz o saldo físico e libera a reserva em uma única operação. O sistema impede um segundo envio do mesmo pedido.
+---
 
-### Cancelar antes do envio
-Abra **Pedidos > Detalhes > Cancelar pedido** e confirme. As reservas são liberadas. Pedidos enviados, entregues ou já cancelados não podem ser cancelados nesta iteração.
+## 4. Pedidos de venda e expedição (`UC05`, `UC07`)
 
-### Exemplo de alteração do saldo
-| Momento | Físico | Reservado | Disponível |
-| --- | --- | --- | --- |
-| Antes do pedido | 10 | 0 | 10 |
-| Pedido de 3 unidades reservado | 10 | 3 | 7 |
-| Pedido enviado | 7 | 0 | 7 |
+### 4.1 Criar pedido de venda com reserva imediata
 
-<!-- page -->
-## 4. Depósitos e recursos de demonstração
+1. Acesse **Pedidos > Novo pedido** (ou utilize o atalho no painel **Visão geral**).
+2. Informe nome do cliente, canal de venda (`Manual`, `Shopee`, `Mercado Livre` ou `Loja virtual`), depósito de atendimento e uma referência exclusiva.
+3. Selecione o produto ativo e a quantidade desejada. Utilize **Adicionar item** para compor pedidos com múltiplos produtos.
+4. Clique em **Salvar**. O pedido nasce na situação **Reservado**, comprometendo o saldo disponível sem reduzir ainda o saldo físico. Caso qualquer item não possua saldo disponível suficiente, o pedido inteiro é recusado sem gerar reservas parciais.
 
-### Criar depósito e transferir mercadorias
-1. Em **Estoque > Novo depósito**, informe nome e localização e salve.
-2. Clique em **Transferir**. Escolha produto, depósito de origem, depósito de destino, quantidade e referência única.
-3. Salve. O saldo sai da origem e a transferência fica **Em trânsito**. O destino ainda não recebe as unidades.
-4. Após a chegada da mercadoria, localize a transferência e clique em **Confirmar recebimento**. O saldo do destino aumenta e a situação passa para **Recebida**.
+### 4.2 Separar, conferir, expedir e entregar
 
-A transferência usa apenas saldo disponível. Não é possível confirmar duas vezes o mesmo recebimento.
+1. No módulo **Expedição** (ou **Pedidos**), abra o pedido clicando em **Detalhes**.
+2. Clique em **Iniciar separação** para avançar o status para **Separação**.
+3. Marque a caixa **Conferido** em todos os itens do pedido e acione **Concluir conferência**. O sistema bloqueia o avanço caso reste algum item pendente; quando todos estão conferidos, o pedido passa para **Pronto**.
+4. Clique em **Registrar envio**, preencha a transportadora e o código de rastreamento e confirme. Nesse instante, o sistema baixa o saldo físico e libera a reserva em uma única transação, mudando a situação para **Enviado**.
+5. Após a entrega ao destinatário, abra novamente os detalhes do pedido e clique em **Confirmar entrega** para encerrar o ciclo em **Entregue**.
 
-### Canais de venda
-Em **Canais de venda**, escolha um canal e clique em **Simular sincronização**. Quando há saldo disponível, o sistema importa um pedido fictício por canal e por dia. Repetir a operação não duplica esse pedido. Consulte o resultado em **Histórico de sincronização**.
+### 4.3 Cancelamento antes do envio
 
-Nenhuma conta real de marketplace está conectada. A ação simula a importação de pedidos; não publica estoque nem envia informações a plataformas externas.
+Enquanto o pedido estiver em **Reservado**, **Separação** ou **Pronto**, é possível abrir **Detalhes > Cancelar pedido**. A confirmação altera a situação para **Cancelado** e devolve integralmente as unidades reservadas ao saldo disponível. Pedidos já enviados, entregues ou cancelados não admitem novo cancelamento.
 
-### Etiqueta de demonstração
-Abra os detalhes de um pedido **Pronto**, **Enviado** ou **Entregue** e selecione **Etiqueta de demonstração**. Clique em **Imprimir / salvar PDF** para abrir a impressão do navegador.
+| Etapa | Saldo Físico | Saldo Reservado | Saldo Disponível |
+| --- | ---: | ---: | ---: |
+| Posição inicial após entrada | 10 | 0 | 10 |
+| Após criação de pedido de 3 unidades (`Reservado`) | 10 | 3 | 7 |
+| Após confirmação de envio (`Enviado` / `Entregue`) | 7 | 0 | 7 |
 
-A etiqueta é interna e está identificada como teste. Não deve ser utilizada para postagem.
+---
 
-### Documentos fiscais demonstrativos
-Em **Documentos fiscais**, localize um pedido não cancelado e clique em **Gerar demonstração**. Confirme a operação. Use **Visualizar** para consultar o documento e **Imprimir / salvar PDF** para imprimi-lo.
+## 5. Recursos demonstrativos (`UC06`, `UC07`, `UC08`)
 
-É gerado um único documento de demonstração por pedido. O documento **não possui validade fiscal** e não substitui NF-e ou NFC-e.
+Para fins de avaliação funcional sem dependência de credenciais fiscais ou contratos comerciais externos, três integrações operam de modo simulado e explicitamente identificado na interface:
 
-<!-- page -->
-## 5. Relatórios e administração de acesso
+- **Sincronização de canais (`Canais de venda`)**: escolha `Shopee`, `Mercado Livre` ou `Loja virtual` e clique em **Simular sincronização**. Havendo produto ativo com saldo disponível no depósito principal, o sistema importa um pedido demonstrativo diário por canal e reserva o estoque. Acionamentos repetidos no mesmo dia não duplicam o pedido.
+- **Etiqueta de envio (`Detalhes do pedido`)**: para pedidos em **Pronto**, **Enviado** ou **Entregue**, clique em **Etiqueta de demonstração** e utilize **Imprimir / salvar PDF** para gerar a etiqueta interna identificada como material de teste.
+- **Documentos fiscais (`Documentos fiscais`)**: localize um pedido não cancelado e clique em **Gerar demonstração**. O sistema emite um único comprovante demonstrativo (`DEMO-...`) vinculado ao pedido, identificado como sem validade fiscal, disponível em **Visualizar** para impressão ou salvamento em PDF.
 
-### Consultar indicadores e exportar
-Abra **Relatórios** para consultar receita expedida, ticket médio, valor do estoque e quantidade de movimentações. A tela também apresenta resultados por canal e as 40 ocorrências mais recentes da trilha de auditoria.
+---
 
-- **Exportar estoque CSV:** baixa uma tabela com SKU, produto, variante, depósito, saldos e custo médio.
-- **Exportar dados:** baixa os registros operacionais disponíveis ao perfil, em JSON, sem hashes de senha.
+## 6. Relatórios, exportações e usuários (`UC09`, `UC10`)
 
-Essas exportações servem para consulta. Elas não realizam a restauração do banco de dados.
+### 6.1 Indicadores, exportação e auditoria
 
-### Cadastrar usuários
-Esta área é exclusiva do perfil **Administrador**.
+No módulo **Relatórios**, acompanhe em tempo real:
+- **Receita expedida** e **Ticket médio** (calculados exclusivamente sobre pedidos nas situações `Enviado` e `Entregue`, sem dupla contagem).
+- **Valor do estoque** (soma do saldo físico multiplicado pelo custo médio atual de cada produto) e total de **Movimentações**.
+- **Resultados por canal** e **Trilha de auditoria** (exibindo as 40 operações mais recentes com data, autor, tipo de ação e identificador).
+- **Exportar estoque CSV**: gera planilha compatível com editores de planilhas contendo SKU, produto, variante, depósito, saldos e custo médio.
+- **Exportar dados**: baixa arquivo JSON com a fotografia operacional visível ao perfil autenticado, sem expor hashes de senha.
 
-1. Abra **Usuários > Novo usuário**.
-2. Informe nome, e-mail, perfil e senha inicial com **10 a 128 caracteres**.
-3. Mantenha **Acesso ativo** marcado e clique em **Salvar**.
-4. Encaminhe as credenciais ao titular da conta em canal reservado.
+### 6.2 Administração de contas de acesso
 
-Em **Editar**, é possível trocar o perfil, redefinir a senha ou desativar o acesso. Para conservar a senha atual, deixe **Nova senha (opcional)** em branco. O administrador não pode desativar nem retirar o próprio perfil de administrador.
+Exclusivo ao perfil **Administrador**, o módulo **Usuários** permite:
+1. Clicar em **Novo usuário**, informar nome, e-mail único, perfil (`Administrador`, `Gestor` ou `Operador`) e senha inicial de **10 a 128 caracteres**.
+2. Utilizar **Editar** para alterar perfil, redefinir senha (deixando em branco para manter a senha atual) ou desmarcar **Acesso ativo** para revogar imediatamente o login e eventuais sessões abertas do usuário. O sistema impede que um administrador desative ou rebaixe a própria conta.
 
-### Acesso do avaliador
-O grupo deve fornecer uma conta de avaliação. O perfil **Administrador** permite observar também a gestão de usuários; o perfil **Gestor** permite avaliar as demais áreas de gestão. O usuário não precisa conhecer nem configurar os serviços de hospedagem para utilizar o sistema.
+---
 
-### Continuidade dos registros
-Os cadastros e as operações são compartilhados entre os usuários e permanecem salvos no banco da aplicação. Fechar o navegador ou sair da conta não apaga os dados. Se o serviço for reiniciado, será necessário realizar novo login.
+## 7. Roteiro rápido de verificação e solução de dúvidas
 
-<!-- page -->
-## 6. Percurso de avaliação e dúvidas
+### 7.1 Percurso completo sugerido para teste
 
-### Percurso sugerido
-1. Entre no sistema e consulte a **Visão geral**.
-2. Cadastre um produto chamado **Produto de avaliação**, com SKU exclusivo, preço de R$ 20,00 e custo de R$ 10,00.
-3. Registre uma entrada de **10 unidades**, com custo de R$ 10,00, no depósito escolhido. Utilize uma referência exclusiva para a entrada.
-4. Crie um pedido de **3 unidades** desse produto no mesmo depósito. Confira: físico 10, reservado 3 e disponível 7.
-5. Inicie a separação, confira o item, conclua a conferência e registre o envio com dados de demonstração.
-6. Verifique que o saldo passou a físico 7, reservado 0 e disponível 7. Confirme a entrega e consulte o **Kardex** e os **Relatórios**.
+1. Autentique-se como **Administrador** e revise os indicadores iniciais em **Visão geral**.
+2. Em **Produtos**, cadastre um item com SKU e código de barras exclusivos ou importe um lote em **Importar CSV** utilizando o modelo disponível.
+3. Em **Estoque > Registrar entrada**, lance **10 unidades** a R$ 10,00 com uma referência exclusiva.
+4. Em **Pedidos > Novo pedido**, venda **3 unidades** desse item e confirme na posição de estoque: físico `10`, reservado `3`, disponível `7`.
+5. Em **Expedição**, abra o pedido, inicie a separação, marque o item como conferido, conclua a conferência, visualize a etiqueta demonstrativa, registre o envio e confirme a entrega (físico `7`, reservado `0`, disponível `7`).
+6. Em **Documentos fiscais**, gere e visualize o documento demonstrativo do pedido; por fim, confira o **Kardex** e os totalizadores em **Relatórios**.
 
-Esse exemplo considera um produto novo, sem outras operações simultâneas sobre seu saldo. A avaliação cria registros reais dentro da base acadêmica compartilhada. Use nomes, SKUs e referências exclusivos a cada execução.
+*Nota sobre dados compartilhados:* no ambiente publicado, os registros persistem no banco PostgreSQL compartilhado. Utilize identificadores de SKU e referências exclusivos a cada bateria de testes.
 
-### Dúvidas frequentes
-| Situação | Orientação |
+### 7.2 Solução de situações frequentes
+
+| Situação observada | Causa e orientação |
 | --- | --- |
-| E-mail ou senha incorretos | Confira os dados de acesso recebidos. Solicite a redefinição ao administrador se necessário. |
-| Muitas tentativas de login | Aguarde um minuto antes de tentar novamente. |
-| Sessão expirada | Entre novamente com sua conta. |
-| Menu não aparece | A opção depende do perfil. Consulte o administrador sobre o acesso necessário. |
-| Estoque insuficiente | Reduza a quantidade, escolha outro depósito ou registre uma entrada. |
-| SKU ou referência já usados | Confira o registro existente. Use um identificador novo apenas para uma nova operação. |
-| Conferência incompleta | Inicie a separação e marque todos os itens como conferidos. |
-| Site não abre ou demora a responder | Confira a internet e o link recebido. Aguarde e tente novamente; se persistir, avise o grupo responsável. |
-
-**Responsável pelo suporte acadêmico:** equipe do projeto NexoStock, Grupo 21.
+| Primeiro carregamento leva cerca de 20 a 30 segundos | Comportamento normal de reativação de instância gratuita em nuvem após período ocioso; as requisições seguintes respondem imediatamente. |
+| Mensagem de e-mail ou senha incorretos | Verifique maiúsculas/minúsculas na senha informada ou solicite redefinição a um Administrador. |
+| Bloqueio temporário no login (`Aguarde um minuto`) | Proteção automática contra tentativas repetidas; aguarde 60 segundos antes de autenticar novamente. |
+| Determinado menu não aparece na barra lateral | A conta conectada possui perfil `Operador` ou `Gestor`; acesse com perfil `Administrador` para visualizar todas as áreas. |
+| Pedido recusado por estoque insuficiente | Algum item excede o saldo disponível (`físico − reservado`) no depósito selecionado; lance uma entrada ou ajuste a quantidade. |
+| SKU, código de barras ou referência já utilizados | O servidor bloqueia duplicidades (`HTTP 409`); informe um código inédito para concluir o novo registro. |
+| Botão de concluir conferência ou enviar bloqueado | Inicie primeiro a separação e marque a caixa **Conferido** em todos os itens do pedido. |

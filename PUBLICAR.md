@@ -1,22 +1,27 @@
-# Documentação da entrega acadêmica
+# Implantação e Acesso - NexoStock
 
-## NexoStock · 1ª iteração da fase de construção
+## Ambiente publicado
 
-A aplicação é acessada pelo navegador, usando o link e as credenciais fornecidos pelo grupo junto com a entrega.
+A aplicação encontra-se publicada no serviço Render com banco de dados PostgreSQL gerenciado no Neon:
 
-| Consulta | Documento |
+- **URL de acesso:** https://nexostock-qbwn.onrender.com/
+- **Verificação de integridade:** https://nexostock-qbwn.onrender.com/api/health
+
+## Documentação de referência
+
+| Finalidade | Arquivo |
 | --- | --- |
-| Apresentação do projeto e percurso de avaliação | [README](README.md) |
-| Como entrar e utilizar o sistema | [Guia do usuário](docs/guia-do-usuario.pdf) |
-| Escopo, regras e verificação da entrega | [Primeira iteração](docs/primeira-iteracao.pdf) |
-| Componentes da aplicação hospedada | [Diagrama de implantação](docs/diagrama-de-implantacao.pdf) |
+| Instruções completas de execução local e arquitetura | [README.md](README.md) |
+| Requisitos, casos de uso e modelagem de projeto | [docs/especificacao-sistema.pdf](docs/especificacao-sistema.pdf) |
+| Manual operacional passo a passo | [docs/guia-do-usuario.pdf](docs/guia-do-usuario.pdf) |
+| Arquitetura física e componentes de nuvem | [docs/diagrama-de-implantacao.pdf](docs/diagrama-de-implantacao.pdf) |
+| Plano de testes, resultados de execução e métricas | [docs/plano-e-relatorio-de-testes.pdf](docs/plano-e-relatorio-de-testes.pdf) |
 
-Para o acesso, informe **E-mail** e **Senha** na página inicial e clique em **Entrar**. Caso ainda não possua uma conta de avaliação, solicite-a ao grupo responsável pelo projeto.
+## Procedimento de publicação no Render
 
-## Registro da A5 – Praticando
-
-O exercício de versionamento utiliza a tag `v1` para preservar o marco da 1ª iteração e a branch `iteracao2` para registrar duas pequenas alterações de documentação (`README.md` e `PUBLICAR.md`). Após o merge em `main`, a branch `iteracao2` permanece no repositório para conferência pelo professor. Esta etapa não corresponde à implementação da segunda iteração.
-
-## A5 – Aplicando Conhecimento (Iteração 2)
-
-A [especificação revisada da Iteração 2](docs/especificacao-iteracao2.md) descreve os requisitos implementados, testes e limitações. A versão de código correspondente está identificada pela tag `v2`. Para executar localmente, instalar as dependências, configurar o ambiente e rodar testes, consulte o [README](README.md). A primeira iteração e seus documentos permanecem preservados para consulta histórica.
+1. Conecte o repositório GitHub ao painel do Render utilizando a especificação declarativa `render.yaml` (runtime Node.js 24, comando de construção `npm ci --omit=dev` e inicialização `npm start`).
+2. Configure no painel seguro do serviço as variáveis obrigatórias não versionadas:
+   - `DATABASE_URL`: string de conexão PostgreSQL com TLS fornecida pelo Neon.
+   - `ADMIN_EMAIL`: endereço de e-mail institucional ou administrativo inicial.
+   - `ADMIN_PASSWORD`: senha de 12 a 128 caracteres exclusiva do ambiente publicado.
+3. Após a subida do serviço, confirme o retorno HTTP 200 na rota `/api/health` e cadastre as contas de avaliação no módulo **Usuários**.
