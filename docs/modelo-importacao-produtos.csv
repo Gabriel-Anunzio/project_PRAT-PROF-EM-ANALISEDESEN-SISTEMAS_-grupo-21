@@ -1,0 +1,6 @@
+sku;name;category;variant;price;cost;min;unit;barcode;weight;active
+CAM-AZU-M;Camiseta Essential;Vestuário;Azul / M;59.90;22.00;6;UN;7898901000015;0.300;true
+CAM-VER-G;Camiseta Essential;Vestuário;Verde / G;59.90;22.00;6;UN;7898901000022;0.320;true
+FON-BT-PRO;Fone Bluetooth Studio;Eletrônicos;Grafite;189.90;88.00;4;UN;7898901000039;0.240;true
+GAR-500-IN;Garrafa Térmica 500 ml;Casa e lazer;Inox;74.90;31.50;5;UN;7898901000046;0.380;true
+SUP-NOTE-AL;Suporte Ergonômico Notebook;Acessórios;Alumínio;119.00;49.00;3;UN;7898901000053;0.650;true

@@ -1,40 +1,42 @@
 @startuml
-title NexoStock - Diagrama de implantação
-1ª iteração da fase de construção
+title NexoStock - Diagrama de Implantação
 skinparam backgroundColor white
 skinparam shadowing false
-skinparam defaultFontName DejaVu Sans
-node "Dispositivo do usuário" <<device>> {
-  node "Navegador web" <<executionEnvironment>> as browser {
-    artifact "index.html\napp.js · style.css" as ui
+skinparam defaultFontName Arial
+skinparam roundcorner 6
+
+node "GitHub" <<repository>> as github #FBE6D4 {
+  artifact "Repositório de Código e Documentação\nserver.js · storage.js · public/\nrender.yaml · package.json · package-lock.json" as source #FEF9EB
+}
+
+node "Dispositivo do Usuário" <<device>> as client #EAF3FC {
+  node "Navegador Web" <<executionEnvironment>> as browser #FFFFFF {
+    artifact "Interface Web (SPA)\nindex.html · style.css · app.js\nimport-csv.js (leitura e validação CSV)" as ui #FEF9EB
+    artifact "Sessão e Documentos\nCookie HttpOnly / SameSite=Strict\nConsulta a /guia e /diagrama (PDF)" as sess #FEF9EB
   }
 }
-node "Render - serviço web" <<cloud>> as render {
-  node "Proxy HTTPS / TLS" as edge
-  node "Node.js 24\nUma instância" <<executionEnvironment>> as app {
-    artifact "server.js · storage.js · config.js\nAPI / autenticação / regras operacionais" as server
-    artifact "Sessões em memória" as sessions
-    artifact "Guia do usuário e diagrama PDF" as docs
+
+node "Render - Serviço Web" <<cloud>> as render #EFEFFD {
+  node "Proxy Reverso HTTPS / TLS\nTerminação TLS e encaminhamento HTTP interno" as proxy #EAF3FC
+  node "Node.js 24 (instância única)" <<executionEnvironment>> as runtime #FFFFFF {
+    artifact "Servidor de Aplicação NexoStock\nAPI JSON, autenticação scrypt e perfis\nValidação de SKU, código de barras e CSV\nInvariantes de saldo e sessões em memória" as app #FEF9EB
   }
 }
-node "Neon" <<cloud>> as neon {
-  database "PostgreSQL" as pg {
-    artifact "nexostock_state\nEstado operacional em JSONB" as state
+
+node "Neon - Banco Gerenciado" <<cloud>> as neon #EBF5EE {
+  database "PostgreSQL" <<database>> as pg #FFFFFF {
+    artifact "Tabela nexostock_state\nEstado operacional em coluna JSONB\nCatálogo, saldos, pedidos, kardex e auditoria" as state #FEF9EB
+    artifact "Integridade e Persistência\nBEGIN / COMMIT / ROLLBACK\nSELECT payload FOR UPDATE" as tx #FEF9EB
   }
 }
-node "GitHub" <<repository>> as github {
-  artifact "Código-fonte e documentação\nrender.yaml · package-lock.json" as source
-}
-browser --> edge : HTTPS / API JSON e arquivos
-edge --> app : HTTP interno / PORT
-app --> pg : PostgreSQL / TLS\ntransações e bloqueio de linha
-github ..> render : implantação do código
-note bottom of pg
-Os registros persistem após reiniciar a aplicação.
-Sessões precisam de novo login após o reinício.
-end note
+
+github ..> render : implantação contínua (Git / HTTPS)
+browser --> proxy : HTTPS / TLS\n(JSON / HTML / PDF)
+proxy --> runtime : HTTP interno (PORT)
+runtime --> pg : PostgreSQL / TLS\n(SQL + JSONB)
+
 note bottom of render
-Canais, etiquetas e documentos fiscais são simulações internas.
-Nenhuma API externa de marketplace, transportadora ou SEFAZ está conectada.
+  Canais de venda, etiquetas de envio e documentos fiscais operam em modo demonstrativo interno.
+  Em desenvolvimento local sem DATABASE_URL, a persistência utiliza data/nexostock.json (FileStore).
 end note
 @enduml
